@@ -3,10 +3,27 @@
 <head>
 	<link type="text/css" href="css/bootstrap.min.css" rel="stylesheet">
 	<link type="text/css" href="css/bootstrap-theme.min.css" rel="stylesheet">
+	<link type="text/css" href="css/bootstrap-editable.min.css" rel="stylesheet">
 	<link type="text/css" href="css/font-awesome.min.css" rel="stylesheet">
 </head>
 
 <body>
+
+<script type="text/x-handlebars" id="components/editable-view">
+      {{#if isEditing}}
+        <form {{action "toggleEditing" on="keyPress" allowedKeys="ctl"}}>
+          {{yield}}
+        </form>
+      {{else}}
+        <span id="a" {{action "toggleEditing" target="view"}}>
+          {{text}}
+        </span>
+      {{/if}}
+</script>
+
+
+ <script type="text/x-handlebars" data-template-name="ideas">
+ 	<section id="syniadapp">
 	<nav class="navbar navbar-default" role="navigation">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#">Syniad</a>
@@ -17,19 +34,83 @@
 			</ul>
 		</div>
 	</nav>
-	<div class="row">
-	<div class="col-lg-2"></div>
-		<div class="col-lg-8">
-			<textarea class="form-control" rows="10" id="canvas"></textarea>
+	<div class="content">
+	
+	{{outlet}}
 
+	</div>
+
+	</section>
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="ideas/index">
+	<div id="idea-list" class="row">
+	<div class="col-lg-1"></div>
+		{{#each itemController="idea"}}
+		<div class="col-lg-3">
+			<div class="panel panel-default">
+				<div class="panel-heading" {{bind-attr class="panel-heading isEditingTitle:editing"}}>
+					{{#if isEditingTitle}}
+						{{edit-idea value=title  class="form-control edit" focus-out="acceptChanges" insert-newLine="acceptChanges"}}
+					{{else}}
+						<span {{action "editTitle" on="doubleClick"}}> {{title}} </span>
+					{{/if}}
+					{{#link-to "idea" this}}<i class="fa fa-bolt"></i>{{/link-to}}
+				</div>
+				
+				<div class="panel-body" {{bind-attr class="panel-body isEditingIdeaBody:editing"}}>
+					{{#if isEditingIdeaBody}}
+						{{edit-idea value=ideaBody class="form-control edit" focus-out="acceptIdeaBodyChanges" insert-newLine="acceptIdeaBodyChanges"}}
+					{{else}}
+						<span {{action "editIdeaBody" on="doubleClick"}}> {{ideaBody}} </span>
+					{{/if}}
+				</div>
+
+			</div>
+		</div>
+		{{/each}}
+	</div>
+	<div class="col-lg-4"></div>
+	<div class="col-lg-3">
+	{{ input type="textarea" id="new-idea" placeholder="New thought" value=newIdeaBody action="createIdea" class="form-control"}}
+	</div>
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="idea">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">{{title}}</div>
+				<div class="panel-body">{{body}}</div>
+			</div>
 		</div>
 	</div>
-	<div class="col-lg-2"></div>
-</body>
-<script type="text/javascript" src="js/jquery-2.0.3.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/underscore-min.js"></script>
-<script type="text/javascript" src="js/backbone-min.js"></script>
 
+
+</script>
+
+<script type="text/x-handlebars" id="_child">
+	<div class="col-lg-3">
+		<div class="panel panel-default">
+		<div class="panel-heading">{{title}} {{#link-to "idea" </div>
+		<div class="panel-body">{{body}}</div>
+		</div>
+	</div>
+	{{#if children}}
+		{{#each children}}
+			{{partial "node"}}
+		{{/each}}
+	{{/if}}
+</script>
+</body>
+<script type="text/javascript" src="js/libs/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/libs/handlebars-1.1.2.js"></script>
+<script type="text/javascript" src="js/libs/ember-1.4.0.js"></script>
+<script type="text/javascript" src="js/libs/ember-data.js"></script>
+
+<script type="text/javascript" src="js/libs/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap-editable.min.js"></script>
 <script type="text/javascript" src="js/syniad.js"></script>
 </html>
